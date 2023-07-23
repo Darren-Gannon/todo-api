@@ -1,8 +1,10 @@
+const { parsed: env } = require('dotenv').config()
+
 module.exports = {
    dialect: 'mssql',
-   host: 'localhost',
-   port: 1433,
-   username: 'sa',
-   password: 'yourStrong(!)Password',
-   database: 'todo',
+   host: env.DATABASE_HOST,
+   port: env.DATABASE_PORT,
+   username: env.DATABASE_USERNAME,
+   password: env.DATABASE_PASSWORD,
+   database: env.DATABASE_NAME,
 }
