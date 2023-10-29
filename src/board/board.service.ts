@@ -30,7 +30,7 @@ export class BoardService {
     createBoardDto: CreateBoardDto,
     auth: AuthPayload,
   ): Promise<Board> {
-    const id = uuid();
+    const id = createBoardDto.id ?? uuid();
     const board = await this.boardModel.create({
       id,
       title: createBoardDto.title,
