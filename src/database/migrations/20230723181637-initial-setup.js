@@ -6,29 +6,29 @@ module.exports = {
     await queryInterface.sequelize.query(`
     CREATE TABLE [Boards](
       [id] [char](36) NOT NULL,
-      [title] [nvarchar](255) NULL,
+      [title] [nvarchar](255) NOT NULL,
       [createdAt] [datetimeoffset](7) NOT NULL,
       [updatedAt] [datetimeoffset](7) NOT NULL,
       PRIMARY KEY ([id]),
     );
     CREATE TABLE [States](
       [id] [char](36) NOT NULL,
-      [title] [nvarchar](255) NULL,
-      [orderIndex] [int] NULL,
+      [title] [nvarchar](255) NOT NULL,
+      [nextStateId] [char](36) NULL,
       [createdAt] [datetimeoffset](7) NOT NULL,
       [updatedAt] [datetimeoffset](7) NOT NULL,
-      [boardId] [char](36) NULL,
+      [boardId] [char](36) NOT NULL,
       PRIMARY KEY ([id]),
       FOREIGN KEY ([boardId]) REFERENCES [Boards]([id]) ON DELETE CASCADE,
     );  
     CREATE TABLE [Tasks](
       [id] [char](36) NOT NULL,
-      [title] [nvarchar](255) NULL,
+      [title] [nvarchar](255) NOT NULL,
       [description] [nvarchar](255) NULL,
       [createdAt] [datetimeoffset](7) NOT NULL,
       [updatedAt] [datetimeoffset](7) NOT NULL,
-      [boardId] [char](36) NULL,
-      [stateId] [char](36) NULL,
+      [boardId] [char](36) NOT NULL,
+      [stateId] [char](36) NOT NULL,
       PRIMARY KEY ([id]),
       FOREIGN KEY ([boardId]) REFERENCES [Boards]([id]) ON DELETE CASCADE,
       FOREIGN KEY ([stateId]) REFERENCES [States]([id]),
