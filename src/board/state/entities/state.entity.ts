@@ -13,20 +13,12 @@ export class State extends Model {
     @Column
     public title: string;
     
-    @Column({ 
-        type: DataType.UUID,
-    })
-    @ForeignKey(() => State)
-    public nextStateId: State['id']
-
-    @BelongsTo(() => State)
-    nextState?: State;
+    @Column
+    public orderIndex: number;
 
     @ForeignKey(() => Board)
     public boardId: Board['id']
 
     @BelongsTo(() => Board)
     public board: Board;
-
-    public orderIndex: number;
 }

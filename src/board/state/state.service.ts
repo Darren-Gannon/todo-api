@@ -17,54 +17,42 @@ export class StateService {
   ) { }
 
   async create(boardId: string, createStateDto: CreateStateDto): Promise<State> {
-    const [board, prevState] = await Promise.all([
+    const [board, prevOrderIndex] = await Promise.all([
       this.boardService.findOne(boardId),
-      this.stateModel.findOne({
+      this.stateModel.max('orderIndex', {
         where: {
           boardId: boardId,
-          nextStateId: { [Op.eq]: null },
         }
-      }),
+      }) as Promise<number|null>,
     ]);
 
     const newState = await this.stateModel.create({
+      id: createStateDto.id ?? uuid(),
       title: createStateDto.title,
       boardId: board.id,
-      nextStateId: null,
-    })
-
-    if (prevState)
-      await prevState.update({ nextStateId: newState.dataValues.id });
+      orderIndex: (prevOrderIndex ?? 0) + 1,
+    });
 
     return newState;
   }
 
   async createMany(boardId: string, createStateDtos: CreateStateDto[]): Promise<State[]> {
-    const [board, prevState] = await Promise.all([
+    const [board, prevOrderIndex] = await Promise.all([
       this.boardService.findOne(boardId),
-      this.stateModel.findOne({
+      this.stateModel.max('orderIndex', {
         where: {
           boardId: boardId,
-          nextStateId: { [Op.eq]: null },
         }
-      }),
+      }) as Promise<number|null>,
     ]);
     
-    const statesToCreate: {
-      id: string;
-      title: string;
-      boardId: string;
-      nextStateId: string | null;
-    }[] = createStateDtos.map((createStateDtos, index, arr) => ({
-      id: uuid(),
-      title: createStateDtos.title,
+    
+    const statesToCreate = createStateDtos.map((createStateDto, index) => ({
+      id: createStateDto.id ?? uuid(),
+      title: createStateDto.title,
       boardId: board.id,
-      nextStateId: null,
+      orderIndex: (prevOrderIndex ?? 0) + index,
     }));
-
-    statesToCreate.forEach((state, index, arr) => {
-      state.nextStateId = arr[index + 1]?.id;
-    })
 
     return this.stateModel.bulkCreate(statesToCreate)
   }
@@ -74,26 +62,10 @@ export class StateService {
       where: {
         boardId,
       },
+      order: [['orderIndex', 'ASC']],
     });
 
-    const statesMap = new Map<string, State>();
-    const stateNextIds = states.map(state => {
-      statesMap.set(state.dataValues.id, state);
-      return state.dataValues.nextStateId;
-    });
-
-    let currentState = states.find(state => !stateNextIds.includes(state.dataValues.id))
-    if(!currentState) return [];
-    const retStates: State[] = [];
-    do {
-      retStates.push(currentState);
-      currentState = statesMap.get(currentState.dataValues.nextStateId);
-    } while(currentState != null);
-
-    return retStates.map((state, index) => {
-      state.orderIndex = index;
-      return state;
-    });
+    return states;
   }
 
   findOne(boardId: Board['id'], id: State['id']): Promise<State> {
@@ -113,20 +85,10 @@ export class StateService {
   }
 
   async remove(boardId: Board['id'], id: State['id']): Promise<State> {
-
     const state = await this.findOne(boardId, id);
+    if (!state)
+      throw new NotFoundException();
 
-    // Find previous state
-    const previousState = await this.stateModel.findOne({
-      where: {
-        boardId: boardId,
-        nextStateId: state.dataValues.id,
-      }
-    });
-    // replace previous next state with current next state
-    if (previousState)
-      await previousState.update({ nextStateId: state.dataValues.nextStateId });
-    // delete current
     await state.destroy();
 
     return state;
