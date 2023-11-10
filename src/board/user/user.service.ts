@@ -68,16 +68,6 @@ export class UserService {
     })
   }
 
-  async update(boardId: string, id: string, updateUserDto: UpdateUserDto, auth: AuthPayload) {
-    // TODO 
-    throw `This action updates a #${id} user`;
-  }
-
-  remove(boardId: string, id: string, auth: AuthPayload) {
-    // TODO 
-    throw `This action removes a #${id} user`;
-  }
-
   public createBoardPermissions(board: Board) { 
     return lastValueFrom(this.permissionService.createPermissions([
       {

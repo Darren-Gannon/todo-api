@@ -1,12 +1,11 @@
 import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
-import { Op } from 'sequelize';
+import { v4 as uuid } from 'uuid';
 import { BoardService } from '../../board/board.service';
 import { Board } from '../../board/entities/board.entity';
 import { CreateStateDto } from './dto/create-state.dto';
 import { UpdateStateDto } from './dto/update-state.dto';
 import { State } from './entities/state.entity';
-import { v4 as uuid } from 'uuid'
 
 @Injectable()
 export class StateService {
@@ -90,6 +89,8 @@ export class StateService {
       throw new NotFoundException();
 
     await state.destroy();
+
+    // TODO fix orderIndex of all after states.
 
     return state;
   }

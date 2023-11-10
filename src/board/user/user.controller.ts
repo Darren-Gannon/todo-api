@@ -25,23 +25,4 @@ export class UserController {
   ) {
     return this.userService.findOne(boardId, id, auth);
   }
-
-  @Patch(':id')
-  update(
-    @Auth() auth: AuthPayload,
-    @Param('boardId') boardId: string,
-    @Param('id') id: string, 
-    @Body() updateUserDto: UpdateUserDto,
-  ) {
-    return this.userService.update(boardId, id, updateUserDto, auth);
-  }
-
-  @Delete(':id')
-  remove(
-    @Auth() auth: AuthPayload,
-    @Param('boardId') boardId: string,
-    @Param('id') id: string,
-  ) {
-    return this.userService.remove(boardId, id, auth);
-  }
 }
