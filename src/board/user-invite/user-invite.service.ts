@@ -9,6 +9,7 @@ import { UpdateUserInviteDto } from './dto/update-user-invite.dto';
 import { UserInvite } from './entities/user-invite.entity';
 import { AppMetadata, ManagementClient, User, UserMetadata } from 'auth0';
 import { UserService } from '../user/user.service';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class UserInviteService {
@@ -32,6 +33,7 @@ export class UserInviteService {
       throw new NotFoundException();
 
     const invite = await this.userInviteModel.create({
+      id: createUserInviteDto.id ?? uuid(),
       boardId: boardId,
       boardTitle: board.title,
       email: createUserInviteDto.email,
