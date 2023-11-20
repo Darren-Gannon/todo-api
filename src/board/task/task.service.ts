@@ -5,6 +5,7 @@ import { InjectModel } from '@nestjs/sequelize';
 import { Task } from './entities/task.entity';
 import { BoardService } from '../../board/board.service';
 import { StateService } from '../state/state.service';
+import { v4 as uuid } from 'uuid';
 
 @Injectable()
 export class TaskService {
@@ -17,6 +18,7 @@ export class TaskService {
   async create(boardId: string, createTaskDto: CreateTaskDto): Promise<Task> {
     const [board, state] = await Promise.all([this.boardService.findOne(boardId), this.stateService.findOne(boardId, createTaskDto.stateId)]);
     return this.taskModel.create({
+      id: createTaskDto.id ?? uuid(),
       title: createTaskDto.title,
       description: createTaskDto.description,
       boardId: board.id,
