@@ -87,6 +87,24 @@ export class UserService {
     return user;
   }
 
+  async remove(boardId: string, id: string, auth: AuthPayload) {
+    const user = await this.userModel.findOne({
+      where: {
+        id,
+        boardId,
+      }
+    })
+    if(!user) throw new NotFoundException();
+    /* 
+      TODO If user is admin check that they are not the last admin
+      If they are the last admin throw an error
+    */
+    const updatedPermissions = await this.removeUserPermissions(boardId, user);
+    await user.destroy();
+    // TODO Inject live user data
+    return user;
+  }
+
   public createBoardPermissions(board: Board) {
     const BoardPermission = BoardPermissions(board.id);
     const StatePermission = BoardStatePermissions(board.id);
@@ -200,6 +218,16 @@ export class UserService {
         permissions: permissionsToRemove,
       }))
     await Promise.allSettled(permissionPromises)
+  }
+
+  private async removeUserPermissions(boardId: string, user: User): Promise<void> {
+    const permissions = buildPermissions(boardId, this.config.audience);
+
+    await this.client.removePermissionsFromUser({
+      id: user.userId,
+    }, {
+      permissions: permissions,
+    });
   }
 }
 

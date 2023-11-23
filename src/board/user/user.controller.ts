@@ -52,4 +52,18 @@ export class UserController {
   ) {
     return this.userService.update(boardId, id, updateUserDto, auth);
   }
+
+  @Delete(':id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardUserPermissions(req.params.boardId);
+    return [write];
+  })
+  remove(
+    @Auth() auth: AuthPayload,
+    @Param('boardId') boardId: string,
+    @Param('id') id: string,
+  ) {
+    return this.userService.remove(boardId, id, auth);
+  }
 }
