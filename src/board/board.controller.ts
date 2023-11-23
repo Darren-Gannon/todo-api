@@ -49,6 +49,6 @@ export class BoardController {
     @Auth() auth: AuthPayload,
     @Param('id') id: string,
   ) {
-    return this.boardService.remove(id);
+    return this.boardService.remove(id, auth);
   }
 }

@@ -25,9 +25,9 @@ export class Notification extends Model {
     public type: NotificationType;
     
     @Column({
-        type: DataType.TEXT('long'),
+        type: DataType.JSON,
     })
-    public data: string;
+    public data: object;
 
     @CreatedAt
     createdAt: Date;

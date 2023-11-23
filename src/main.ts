@@ -22,7 +22,6 @@ async function bootstrap() {
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe());
   app.useGlobalGuards(app.get(AuthzGuard));
-  // app.useGlobalGuards(new DelayTimerGuard(2000));
   app.enableShutdownHooks();
 
   const config = app.get(ConfigService);

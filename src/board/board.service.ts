@@ -41,9 +41,9 @@ export class BoardService {
     await this.notificationService.create({
       title: `Board '${ createBoardDto.title }' created`,
       type: NotificationType.CREATE_BOARD,
-      data: JSON.stringify({
+      data: {
         board,
-      }),
+      },
     }, [auth.sub], auth);
 
     await this.userService.create(board.id, {
@@ -80,8 +80,9 @@ export class BoardService {
     return original.update(updateBoardDto);
   }
 
-  async remove(id: string): Promise<Board> {
+  async remove(id: string, auth: AuthPayload): Promise<Board> {
     const original = await this.findOne(id);
+    await this.notificationService.removeForBoard(id, auth);
     await this.boardModel.destroy({
       where: { id },
     });

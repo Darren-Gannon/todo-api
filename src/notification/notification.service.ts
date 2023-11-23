@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
-import { CreateNotificationDto } from './dto/create-notification.dto';
-import { UpdateNotificationDto } from './dto/update-notification.dto';
 import { InjectModel } from '@nestjs/sequelize';
-import { Notification } from './entities/notification.entity';
 import { AuthPayload } from '../authz/auth.decorator';
 import { User } from '../user/entities/user.entity';
+import { CreateNotificationDto } from './dto/create-notification.dto';
+import { UpdateNotificationDto } from './dto/update-notification.dto';
+import { Notification } from './entities/notification.entity';
 
 @Injectable()
 export class NotificationService {
@@ -48,5 +48,14 @@ export class NotificationService {
     const notification = await this.findOne(id, auth);
     await notification.destroy();
     return notification;
+  }
+
+  async removeForBoard(boardId: string, auth: AuthPayload) {
+    const notifications = await this.notificationModel.destroy({
+      where: {
+        'data.board.id': boardId,
+      },
+    });
+    return notifications;
   }
 }

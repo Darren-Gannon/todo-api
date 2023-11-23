@@ -45,7 +45,7 @@ export class UserInviteService {
     if(user) {
       this.notificationService.create({
         title: `You have been invited to join board ${ board.dataValues.title }`,
-        data: JSON.stringify({ invite }),
+        data: { invite, board },
         type: NotificationType.INVITE_USER,
       }, [user.user_id], auth); // Dont need to await
     }
@@ -85,9 +85,8 @@ export class UserInviteService {
     return invite;
   }
 
-  async removeForBoard(boardId: string, id: string) {
+  async removeForBoard(boardId: string, id: string, auth: AuthPayload) {
     const invite = await this.findOneForBoard(boardId, id);
-
     await invite.destroy();
 
     return invite;

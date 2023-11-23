@@ -52,7 +52,7 @@ export class UserInviteController {
     @Param('boardId') boardId: string,
     @Param('id') id: string,
   ) {
-    return this.userInviteService.removeForBoard(boardId, id);
+    return this.userInviteService.removeForBoard(boardId, id, auth);
   }
 
   @Get('user-invite')

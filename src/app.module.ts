@@ -36,7 +36,7 @@ const DATABASE_LOGGER = new Logger('Database');
       imports: [ConfigModule],
       inject: [ConfigService],
       useFactory: (config: ConfigService) => ({
-        dialect: 'mssql',
+        dialect: 'mysql',
         host: config.get('DATABASE_HOST'),
         port: config.get('DATABASE_PORT'),
         username: config.get('DATABASE_USERNAME'),
