@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, NotFoundException, BadRequestException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { InjectModel } from '@nestjs/sequelize';
@@ -96,9 +96,19 @@ export class UserService {
     })
     if(!user) throw new NotFoundException();
     /* 
-      TODO If user is admin check that they are not the last admin
+      If user is admin check that they are not the last admin
       If they are the last admin throw an error
     */
+    if(user.role == UserRole.ADMIN) {
+      const admins = await this.userModel.findAll({
+        where: {
+          boardId,
+          role: UserRole.ADMIN,
+        }
+      })
+      if(admins.length == 1) 
+        throw new BadRequestException("Cannot remove last admin");
+    }
     const updatedPermissions = await this.removeUserPermissions(boardId, user);
     await user.destroy();
     // TODO Inject live user data
