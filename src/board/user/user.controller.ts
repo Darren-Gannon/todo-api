@@ -37,4 +37,19 @@ export class UserController {
   ) {
     return this.userService.findOne(boardId, id, auth);
   }
+
+  @Patch(':id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardUserPermissions(req.params.boardId);
+    return [write];
+  })
+  update(
+    @Auth() auth: AuthPayload,
+    @Param('boardId') boardId: string,
+    @Param('id') id: string,
+    @Body() updateUserDto: UpdateUserDto,
+  ) {
+    return this.userService.update(boardId, id, updateUserDto, auth);
+  }
 }

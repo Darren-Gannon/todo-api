@@ -72,6 +72,21 @@ export class UserService {
     })
   }
 
+  async update(boardId: string, id: string, updateUserDto: UpdateUserDto, auth: AuthPayload) {
+    const user = await this.userModel.findOne({
+      where: {
+        id,
+        boardId,
+      }
+    })
+    if(!user) throw new NotFoundException();
+    user.role = updateUserDto.role;
+    await user.save();
+    const updatedPermissions = await this.updateUserPermissions(boardId, user);
+    // TODO Inject live user data
+    return user;
+  }
+
   public createBoardPermissions(board: Board) {
     const BoardPermission = BoardPermissions(board.id);
     const StatePermission = BoardStatePermissions(board.id);
