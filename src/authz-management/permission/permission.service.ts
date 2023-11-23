@@ -1,6 +1,6 @@
 import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
-import { Observable, catchError, map, switchMap, tap } from 'rxjs';
+import { Observable, combineLatest, of, map, switchMap, tap } from 'rxjs';
 import { AuthzManagementModuleConfig } from '../authz-management.module-config';
 import { Permission } from './permission';
 
@@ -27,8 +27,18 @@ export class PermissionService {
         ); 
 
         const req$ = accessToken$.pipe(
-            switchMap(token => this.http.patch(`https://${ this.config.domain }/api/v2/resource-servers/${ this.config.resourceId }`, {
-                scopes: permissions,
+            switchMap(token => combineLatest([
+                of(token),
+                this.http.get(`https://${ this.config.domain }/api/v2/resource-servers/${ this.config.resourceId }`, {
+                    headers: {
+                        Authorization: `Bearer ${ token }`,
+                    }
+                }).pipe(
+                    map(resp => resp.data.scopes),
+                ),
+            ])),
+            switchMap(([token, existingScopes]) => this.http.patch(`https://${ this.config.domain }/api/v2/resource-servers/${ this.config.resourceId }`, {
+                scopes: [...permissions, ...existingScopes],
             }, {
                 headers: {
                     Authorization: `Bearer ${ token }`,
