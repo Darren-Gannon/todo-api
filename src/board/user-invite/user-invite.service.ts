@@ -87,6 +87,7 @@ export class UserInviteService {
 
   async removeForBoard(boardId: string, id: string, auth: AuthPayload) {
     const invite = await this.findOneForBoard(boardId, id);
+    await this.notificationService.removeForInvite(id, auth);
     await invite.destroy();
 
     return invite;
@@ -130,6 +131,7 @@ export class UserInviteService {
       userId: auth.sub,
       role: invite.role,
     }, auth);
+    await this.notificationService.removeForInvite(id, auth);
     await invite.destroy();
     return user;
   }
@@ -137,6 +139,7 @@ export class UserInviteService {
   async removeForUser(id: string, auth: AuthPayload) {
     const invite = await  this.findOneForUser(id, auth);
 
+    await this.notificationService.removeForInvite(id, auth);
     await invite.destroy();
 
     return invite;

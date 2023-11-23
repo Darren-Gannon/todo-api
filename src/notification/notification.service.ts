@@ -58,4 +58,13 @@ export class NotificationService {
     });
     return notifications;
   }
+
+  async removeForInvite(inviteId: string, auth: AuthPayload) {
+    const notifications = await this.notificationModel.destroy({
+      where: {
+        'data.invite.id': inviteId,
+      },
+    });
+    return notifications;
+  }
 }
