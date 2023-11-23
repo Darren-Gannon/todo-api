@@ -4,6 +4,9 @@ import { CreateStateDto } from './dto/create-state.dto';
 import { UpdateStateDto } from './dto/update-state.dto';
 import { Auth, AuthPayload } from '../../authz/auth.decorator';
 import { ApiOAuth2 } from '@nestjs/swagger';
+import { Permission } from 'src/authz/permission.guard';
+import { BoardPermissions } from '../board-permissions.enum';
+import { BoardStatePermissions } from './board-state-permissions.enum';
 
 @Controller('board/:boardId/state')
 @ApiOAuth2([], 'Auth0')
@@ -13,6 +16,11 @@ export class StateController {
   ) { }
 
   @Post()
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardStatePermissions(req.params.boardId);
+    return [write];
+  })
   create(
     @Auth() auth: AuthPayload,
     @Param('boardId') boardId: string,
@@ -22,6 +30,11 @@ export class StateController {
   }
 
   @Post('many')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardStatePermissions(req.params.boardId);
+    return [write];
+  })
   createMany(
     @Auth() auth: AuthPayload,
     @Param('boardId') boardId: string,
@@ -31,6 +44,11 @@ export class StateController {
   }
 
   @Get()
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { read } = BoardStatePermissions(req.params.boardId);
+    return [read];
+  })
   findAll(
     @Auth() auth: AuthPayload,
     @Param('boardId') boardId: string,
@@ -39,6 +57,11 @@ export class StateController {
   }
 
   @Get(':id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { read } = BoardStatePermissions(req.params.boardId);
+    return [read];
+  })
   findOne(
     @Auth() auth: AuthPayload,
     @Param('id') id: string,
@@ -48,6 +71,11 @@ export class StateController {
   }
 
   @Patch(':id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardStatePermissions(req.params.boardId);
+    return [write];
+  })
   update(
     @Auth() auth: AuthPayload,
     @Param('id') id: string, 
@@ -58,6 +86,11 @@ export class StateController {
   }
 
   @Delete(':id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardStatePermissions(req.params.boardId);
+    return [write];
+  })
   remove(
     @Auth() auth: AuthPayload,
     @Param('id') id: string,

@@ -4,6 +4,8 @@ import { CreateBoardDto } from './dto/create-board.dto';
 import { UpdateBoardDto } from './dto/update-board.dto';
 import { Auth, AuthPayload } from '../authz/auth.decorator';
 import { ApiOAuth2 } from '@nestjs/swagger';
+import { Permission } from 'src/authz/permission.guard';
+import { BoardPermissions } from './board-permissions.enum';
 
 @Controller('board')
 @ApiOAuth2([], 'Auth0')
@@ -28,6 +30,11 @@ export class BoardController {
   }
 
   @Get(':id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { read } = BoardPermissions(req.params.id);
+    return [read];
+  })
   findOne(
     @Auth() auth: AuthPayload,
     @Param('id') id: string,
@@ -36,6 +43,11 @@ export class BoardController {
   }
 
   @Patch(':id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardPermissions(req.params.id);
+    return [write];
+  })
   update(
     @Auth() auth: AuthPayload,
     @Param('id') id: string, 
@@ -45,6 +57,11 @@ export class BoardController {
   }
 
   @Delete(':id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardPermissions(req.params.id);
+    return [write];
+  })
   remove(
     @Auth() auth: AuthPayload,
     @Param('id') id: string,

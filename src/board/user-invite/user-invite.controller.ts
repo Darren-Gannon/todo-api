@@ -4,6 +4,8 @@ import { CreateUserInviteDto } from './dto/create-user-invite.dto';
 import { UpdateUserInviteDto } from './dto/update-user-invite.dto';
 import { ApiOAuth2 } from '@nestjs/swagger';
 import { Auth, AuthPayload } from '../../authz/auth.decorator';
+import { Permission } from 'src/authz/permission.guard';
+import { BoardUserPermissions } from '../user/board-user-permissions.enum';
 
 @Controller('')
 @ApiOAuth2([], 'Auth0')
@@ -11,6 +13,11 @@ export class UserInviteController {
   constructor(private readonly userInviteService: UserInviteService) {}
 
   @Post('board/:boardId/user-invite')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardUserPermissions(req.params.boardId);
+    return [write];
+  })
   create(
     @Auth() auth: AuthPayload,
     @Param('boardId') boardId: string,
@@ -20,6 +27,11 @@ export class UserInviteController {
   }
 
   @Get('board/:boardId/user-invite')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { read } = BoardUserPermissions(req.params.boardId);
+    return [read];
+  })
   findAllForBoard(
     @Auth() auth: AuthPayload,
     @Param('boardId') boardId: string,
@@ -28,6 +40,11 @@ export class UserInviteController {
   }
 
   @Get('board/:boardId/user-invite/:id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { read } = BoardUserPermissions(req.params.boardId);
+    return [read];
+  })
   findOneForBoard(
     @Auth() auth: AuthPayload,
     @Param('boardId') boardId: string,
@@ -37,6 +54,11 @@ export class UserInviteController {
   }
 
   @Patch('board/:boardId/user-invite/:id')
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardUserPermissions(req.params.boardId);
+    return [write];
+  })
   updateForBoard(
     @Auth() auth: AuthPayload,
     @Param('boardId') boardId: string,
@@ -46,6 +68,11 @@ export class UserInviteController {
     return this.userInviteService.updateForBoard(boardId, id, updateUserInviteDto);
   }
 
+  @Permission(ctx => {
+    const req = ctx.switchToHttp().getRequest();
+    const { write } = BoardUserPermissions(req.params.boardId);
+    return [write];
+  })
   @Delete('board/:boardId/user-invite/:id')
   removeForBoard(
     @Auth() auth: AuthPayload,

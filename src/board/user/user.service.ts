@@ -10,6 +10,10 @@ import { ManagementClient } from 'auth0';
 import { Board } from '../entities/board.entity';
 import { UserModuleConfig } from './user.module-config';
 import { UserRole } from './dto/user-role.enum';
+import { BoardPermissions } from '../board-permissions.enum';
+import { BoardStatePermissions } from '../state/board-state-permissions.enum';
+import { BoardTaskPermissions } from '../task/board-task-permissions.enum';
+import { BoardUserPermissions } from './board-user-permissions.enum';
 
 @Injectable()
 export class UserService {
@@ -68,38 +72,42 @@ export class UserService {
     })
   }
 
-  public createBoardPermissions(board: Board) { 
+  public createBoardPermissions(board: Board) {
+    const BoardPermission = BoardPermissions(board.id);
+    const StatePermission = BoardStatePermissions(board.id);
+    const TaskPermission = BoardTaskPermissions(board.id);
+    const UserPermission = BoardUserPermissions(board.id);
     return lastValueFrom(this.permissionService.createPermissions([
       {
-        value: `board:${ board.id }:read`,
+        value: BoardPermission.read,
         description: `Ability to read board ${ board.id }`
       },
       {
-        value: `board:${ board.id }:write`,
+        value: BoardPermission.write,
         description: `Ability to update board ${ board.id }`
       },
       {
-        value: `board:${ board.id }:state:read`,
+        value: StatePermission.read,
         description: `Ability to read board ${ board.id } states`
       },
       {
-        value: `board:${ board.id }:state:write`,
+        value: StatePermission.write,
         description: `Ability to update board ${ board.id } states`
       },
       {
-        value: `board:${ board.id }:task:read`,
+        value: TaskPermission.read,
         description: `Ability to read board ${ board.id } tasks`
       },
       {
-        value: `board:${ board.id }:task:write`,
+        value: TaskPermission.write,
         description: `Ability to update board ${ board.id } tasks`
       },
       {
-        value: `board:${ board.id }:user:read`,
+        value: UserPermission.read,
         description: `Ability to read board ${ board.id } users`
       },
       {
-        value: `board:${ board.id }:user:write`,
+        value: UserPermission.write,
         description: `Ability to update board ${ board.id } users`
       },
     ]));
