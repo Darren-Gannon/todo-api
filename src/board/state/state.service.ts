@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { Injectable, BadRequestException, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/sequelize';
 import { v4 as uuid } from 'uuid';
 import { BoardService } from '../../board/board.service';
@@ -30,6 +30,10 @@ export class StateService {
       title: createStateDto.title,
       boardId: board.id,
       orderIndex: (prevOrderIndex ?? 0) + 1,
+    }).catch(err => {
+      if(err.errors?.[0]?.type === 'unique violation')
+        throw new BadRequestException('State with this title already exists');
+      throw err;
     });
 
     return newState;

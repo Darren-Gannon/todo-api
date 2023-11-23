@@ -1,7 +1,11 @@
 import { Table, Column, Model, PrimaryKey, DataType, ForeignKey, BelongsTo } from 'sequelize-typescript';
 import { Board } from '../../../board/entities/board.entity';
 
-@Table
+@Table({
+    indexes:[
+        { fields: ['boardId', 'title'], unique: true, },
+    ]
+})
 export class State extends Model {
     @PrimaryKey
     @Column({ 
